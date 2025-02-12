@@ -21,6 +21,16 @@
     </form>
 
     <h2>Task List</h2>
+    <button onclick="undoDelete()">Undo Last Delete</button>
+
+<script>
+    function undoDelete() {
+        fetch('/undo_delete', { method: "POST" })
+            .then(response => {
+                location.reload();
+            });
+    }
+</script>
     <table>
         <tr>
             <th>Task</th>
@@ -33,9 +43,26 @@
             <td>{{ task[2] }}</td>
             <td>
                 {% if task[3] == 0 %}
-                <a href="/complete/{{ task[0] }}">Complete</a>
+                <button onclick="window.location.href='/complete/{{ task[0] }}'">
+    ✅
+</button>
                 {% endif %}
-                <a href="/delete/{{ task[0] }}">Delete</a>
+                <button onclick="confirmDelete({{ task[0] }})">
+    🗑️
+</button>
+<script>
+    function confirmDelete(taskId) {
+        if (confirm("Are you sure you want to delete this task? This action cannot be undone.")) {
+            fetch(`/delete/${taskId}`, { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        location.reload();
+                    }
+                });
+        }
+    }
+</script>
             </td>
         </tr>
         {% endfor %}

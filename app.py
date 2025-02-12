@@ -3,6 +3,9 @@ import sqlite3
 
 app = Flask(__name__)
 
+# Store recently deleted tasks for undo functionality
+deleted_tasks = []
+
 def init_db():
     with sqlite3.connect("tasks.db") as conn:
         cursor = conn.cursor()
@@ -39,12 +42,29 @@ def complete_task(task_id):
         conn.commit()
     return redirect('/')
 
-@app.route('/delete/<int:task_id>')
+@app.route('/delete/<int:task_id>', methods=['POST'])
 def delete_task(task_id):
+    global deleted_tasks
     with sqlite3.connect("tasks.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
-        conn.commit()
+        cursor.execute("SELECT * FROM tasks WHERE id=?", (task_id,))
+        task = cursor.fetchone()
+        if task:
+            deleted_tasks.append(task)  # Store deleted task for undo
+            cursor.execute("DELETE FROM tasks WHERE id=?", (task_id,))
+            conn.commit()
+    return jsonify({'status': 'success'})
+
+@app.route('/undo_delete', methods=['POST'])
+def undo_delete():
+    global deleted_tasks
+    if deleted_tasks:
+        with sqlite3.connect("tasks.db") as conn:
+            cursor = conn.cursor()
+            last_task = deleted_tasks.pop()  # Retrieve last deleted task
+            cursor.execute("INSERT INTO tasks (id, title, description, completed) VALUES (?, ?, ?, ?)",
+                           (last_task[0], last_task[1], last_task[2], last_task[3]))
+            conn.commit()
     return redirect('/')
 
 if __name__ == '__main__':
