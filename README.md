@@ -1,9 +1,9 @@
 # Task Management Microservice - Logging Failed Login Attempts
 
-## 📌 Overview
+## Overview
 This microservice is responsible for logging failed login attempts in a task management system.
 
-## 📑 Communication Contract
+## Communication Contract
 - **Endpoint:** `POST /log_attempt`
 - **Request Format:**
   ```json
