@@ -20,7 +20,7 @@ This microservice is responsible for logging failed login attempts in a task man
   "data": { ... }
 }
 
-## 🔄 UML Sequence Diagram
+## UML Sequence Diagram
 Below is the UML sequence diagram showing the interaction between the client, microservice, and database.
 
 ![UML Diagram]<img width="1063" alt="uml" src="https://github.com/user-attachments/assets/bf14be1d-ffb7-4df2-b961-941c483de0b2" />
